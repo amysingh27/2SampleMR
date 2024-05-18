@@ -1,0 +1,138 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+```{r}
+library(TwoSampleMR)
+```
+
+
+```{r}
+ldlfiltered <- read.delim("C:/Users/Amy/Desktop/Paper1/ldlfiltered.txt", header=FALSE)
+```
+
+```{r}
+head(ldlfiltered)
+```
+
+```{r}
+str(ldlfiltered)
+```
+
+
+```{r}
+colnames(ldlrfiltered_data) <- c("rsID", "SNP", "CHROM", "POS_b37", "REF", "ALT", "N", "N_studies", "POOLED_ALT_AF", "EFFECT_SIZE", "SE", "pvalue_neg_log10", "pvalue", "pvalue_neg_log10_GC", "pvalue_GC")
+```
+
+
+```{r}
+head(ldlfiltered)
+```
+
+
+```{r}
+ldlr
+19
+11200038
+11244492
+300KB
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+library(GenomicRanges)
+```
+
+
+```{r}
+chromosome19_region_start <- 11200038 - 300000
+chromosome19_region_end <- 11244492 + 300000
+```
+
+```{r}
+ldlrfiltered_data <- filterd22 %>%
+  filter(CHROM == 19 & POS_b37 >= chromosome19_region_start & POS_b37 <= chromosome19_region_end)
+```
+
+
+```{r}
+head(ldlrfiltered_data)
+```
+
+```{r}
+colnames(ldlrfiltered_data) <- c("rsID", "SNP", "CHROM", "POS_b37", "REF", "ALT", "N", "N_studies", "POOLED_ALT_AF", "EFFECT_SIZE", "SE", "pvalue_neg_log10", "pvalue", "pvalue_neg_log10_GC", "pvalue_GC")
+```
+
+```{r}
+head (ldlrdiltered)
+```
+
+```{r}
+outdata <- read.table("C:/Users/Amy/Desktop/Paper2/outdata.tsv", quote="\"", comment.char="")
+```
+
+
+```{r}
+head (outdata)
+```
+
+```{r}
+colnames(outdata) <- c("CHR", "POS", "SNP", "Tested_Allele", "Other_Allele", "FREQ_African_American", "BETA_African_American_all", "SE_African_American_all", "p_African_American_all", "N_African_American_all")
+```
+
+```{r}
+head (outdata)
+```
+
+# merge outfiltered and ldlrfiltered_data by the common column SNP. retaining only the rsID column from ldlrfiltered_data. need everything from oufiltered. outfiltered should also have rsID- GET CODE
+
+```{r}
+merged_data <- outdata %>%inner_join(ldlrdiltered %>% select(SNP, rsID), by = "SNP")
+```
+
+```{r}
+Exp_format <- format_data(ldlrdiltered, header = TRUE, type = "exposure", snp_col = "rsID", beta_col = "EFFECT_SIZE", se_col = "SE", effect_allele_col = "ALT", other_allele_col = "REF", eaf_col = "POOLED_ALT_AF", pval_col = "pvalue")
+```
+
+```{r}
+head(Exp_format)
+```
+
+```{r}
+write.table(Exp_format, file = "formattedexp_data.txt", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+```
+
+```{r}
+Out_format <- format_data(merged_data, header = TRUE, type = "outcome", snp_col = "rsID", beta_col = "BETA_African_American_all", se_col = "SE_African_American_all", effect_allele_col = "Tested_Allele", other_allele_col = "Other_Allele", eaf_col = "FREQ_African_American", pval_col = "p_African_American_all")
+```
+
+```{r}
+head(Out_format)
+```
+
+```{r}
+write.table(Out_format, file = "formattedout_data.txt", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+```
+
+```{r}
+Exp_Out_Harmonized <- harmonise_data(exposure_dat = Exp_format, outcome_dat = Out_format, action = 3)
+```
+
+```{r}
+Exp_Out_Harmonized_Clumped <- clump_data(Exp_Out_Harmonized, clump_r2 = 0.01, pop = "AFR")
+```
+
+```{r}
+res <- mr(Exp_Out_Harmonized_Clumped)
+```
+
+```{r}
+write.table(res, file = "resLDLR.txt", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+```
