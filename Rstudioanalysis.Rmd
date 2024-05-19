@@ -37,8 +37,8 @@ head(ldlfiltered)
 # ldlr      #HMGCR        #ACLY        #PCSK9      #NPC1L1      #APOB      #CETP        
 19            5            17            1          7            2          16
 11200038      74632154     40023161      55505221   44552134     21224301   56995762
-11244492      74657929     40086795      55530525   44580914     21266945   57017757
-300KB
+11244492      74657929-merge yielded 0 data     40086795- after filtering, yielded 0 data      55530525-done   44580914     21266945- No SNPs availabl   57017757- could not format outcome data, merged data                                                                                                 had 0 obs.
+300KB- done
 ```
 
 ```{r}
